@@ -1,10 +1,13 @@
 require 'rspec'
 require 'rspec/core/command_line'
+require 'rspec/core/formatters/helpers'
 require 'redis'
 require 'optparse'
 
 module Qspec
   class CommandLine < ::RSpec::Core::CommandLine
+    attr_reader :output
+
     def initialize(options)
       @rest = parse(options)
       assert_option_combination
@@ -36,7 +39,7 @@ module Qspec
 
     def run(err, out)
       @configuration.error_stream = err
-      @configuration.output_stream ||= out
+      @output = @configuration.output_stream ||= out
       @options.configure(@configuration)
 
       if @qspec_opts[:count]
@@ -49,7 +52,7 @@ module Qspec
     def start_worker
       redis = Redis.new
       id = rand(10000)
-      puts "ID: #{id}"
+      output.puts "ID: #{id}"
       register_files(redis, id)
       @qspec_opts[:count].times do |i|
         spawn({ "TEST_ENV_NUMBER" => i == 0 ? '' : (i + 1).to_s },
@@ -58,13 +61,14 @@ module Qspec
       end
       success = Process.waitall.all? { |pid, status| status.exitstatus == 0 }
       while redis.llen("stat_#{id}") > 0
-        p Marshal.load(redis.lpop("stat_#{id}"))
+        output.puts Marshal.load(redis.lpop("stat_#{id}")).inspect
       end
-      puts "Failures: " if redis.llen("failure_#{id}") > 0
+      output.puts "Failures: " if redis.llen("failure_#{id}") > 0
       while redis.llen("failure_#{id}") > 0
-        p Marshal.load(redis.lpop("failure_#{id}"))
+        failure = Marshal.load(redis.lpop("failure_#{id}"))
+        dump_failure(failure)
+        dump_backtrace(failure[:exception])
       end
-
       exit(success ? 0 : 1)
     ensure
       if redis
@@ -74,8 +78,26 @@ module Qspec
       end
     end
 
+    def dump_failure(failure)
+      exception = failure[:exception]
+      exception_class_name = exception.class.to_s
+      output.puts
+      output.puts "* #{failure[:description]}"
+      output.puts "\tFailure/Error: #{failure[:position]}"
+      output.puts "\t#{exception_class_name}:" unless exception_class_name =~ /RSpec/
+      exception.message.to_s.split("\n").each { |line| output.puts "\t  #{line}" } if exception.message
+    end
+
+    def dump_backtrace(exception)
+      lines = RSpec::Core::BacktraceFormatter.format_backtrace(exception.backtrace,
+                                                               { full_backtrace: @options.options[:full_backtrace] })
+      lines.each do |line|
+        output.puts "\t#{line}"
+      end
+    end
+
     def register_files(redis, id)
-      sort_by_size(@configuration.files_to_run).uniq do |f|
+      sort_by_size(@configuration.files_to_run).uniq.each do |f|
         redis.rpush "to_run_#{id}", f
       end
     end
