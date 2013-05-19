@@ -1,5 +1,9 @@
-require 'drb/drb'
-require 'spork/test_framework/qspec'
+# spork is optional
+begin
+  require 'drb/drb'
+  require 'spork/test_framework/qspec'
+rescue LoadError
+end
 
 module Qspec
   module SporkHelper
