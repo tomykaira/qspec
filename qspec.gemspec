@@ -8,12 +8,14 @@ Gem::Specification.new do |gem|
   gem.version       = Qspec::VERSION
   gem.authors       = ["tomykaira"]
   gem.email         = ["tomykaira@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{QSpec inserts spec files to a queue.  Workers process that queue one by one.}
+  gem.summary       = %q{QSpec is extension of RSpec.  Q is for queue, and quick.}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
+
+  gem.add_dependency 'rspec-core', '2.13.0'
 end

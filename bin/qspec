@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'qspec'
+status = Qspec::CommandLine.new(ARGV).run($stderr, $stdout).to_i
+exit status
