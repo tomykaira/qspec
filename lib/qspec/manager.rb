@@ -14,9 +14,9 @@ module Qspec
           end
         end
       else
-        @qspec_opts[:count].times do |i|
+        @options.options[:count].times do |i|
           spawn({ "TEST_ENV_NUMBER" => i == 0 ? '' : (i + 1).to_s },
-                @qspec_opts[:command] || "qspec --id #{id} #{@rest.join(' ')}",
+                @options.options[:command] || "qspec --id #{id}",
                 out: '/dev/null')
         end
       end

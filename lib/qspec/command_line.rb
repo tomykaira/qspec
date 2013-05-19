@@ -3,6 +3,7 @@ require 'rspec/core/command_line'
 require 'rspec/core/formatters/helpers'
 require 'qspec/manager'
 require 'qspec/spork_helper'
+require 'qspec/configuration_options'
 require 'redis'
 require 'optparse'
 
@@ -13,36 +14,11 @@ module Qspec
     attr_reader :output, :redis
 
     def initialize(options)
-      @rest = parse(options)
       @redis = Redis.new
-      assert_option_combination
-      super(@rest.dup)
-    end
 
-    def parse(options)
-      @qspec_opts = {}
-      opts = OptionParser.new
-      opts.on('--id id') do |id|
-        @qspec_opts[:id] = id.to_i
-      end
-      opts.on('--parallel num') do |count|
-        @qspec_opts[:count] = count.to_i
-      end
-      opts.on('--command command') do |command|
-        @qspec_opts[:command] = command
-      end
-      opts.on('--spork') do
-        @qspec_opts[:spork] = true
-      end
-
-      opts.parse!(options)
-    end
-
-    def assert_option_combination
-      if @qspec_opts[:count] && @qspec_opts[:id] ||
-          @qspec_opts[:count].nil? && @qspec_opts[:id].nil?
-        raise ArgumentError.new("Specify one of --id or --parallel")
-      end
+      options = ::Qspec::ConfigurationOptions.new(options)
+      options.parse_options
+      super(options)
     end
 
     def run(err, out)
@@ -50,9 +26,9 @@ module Qspec
       @output = @configuration.output_stream ||= out
       @options.configure(@configuration)
 
-      if @qspec_opts[:spork]
+      if @options.options[:spork]
         start_spork_workers
-      elsif @qspec_opts[:count] || @options.options[:drb]
+      elsif @options.options[:count] || @options.options[:drb]
         start_worker
       else
         process
@@ -61,7 +37,7 @@ module Qspec
 
     def process
       success = true
-      id = @qspec_opts[:id]
+      id = @options.options[:id]
       while f = redis.lpop("to_run_#{id}")
         @configuration.add_formatter(Qspec::Formatters::RedisFormatterFactory.build(id, f))
         begin
