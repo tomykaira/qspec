@@ -25,12 +25,15 @@ HEAD version is highly recommended.  Old `spork` does not detect Qspec in cases.
   gem 'spork', github: 'sporkrb/spork'
 ```
 
-Currently, `redis` is required to do inter-process communication.
-We will remove this requirement until the release, and replace with simple files.
+By default, qspec uses file based inter-process communication.
+This is poor implementation and becomes a burden.
+
+We recommend to use `redis`.  Setting up redis-server with default port, and add `redis` gem to your Gemfile is enough.
+If `require 'redis'` succeed, it uses automatically redis for IPC.
 
 ## Usage
 
-Installing this gem add `qspec` command.
+Installing this gem adds `qspec` command.
 
 ### Run spec in 8 cores
 
