@@ -2,12 +2,14 @@ require 'rspec'
 require 'rspec/core/command_line'
 require 'rspec/core/formatters/helpers'
 require 'qspec/manager'
+require 'qspec/spork_helper'
 require 'redis'
 require 'optparse'
 
 module Qspec
   class CommandLine < ::RSpec::Core::CommandLine
     include Manager # defines start_worker
+    include SporkHelper
     attr_reader :output, :redis
 
     def initialize(options)
@@ -29,6 +31,9 @@ module Qspec
       opts.on('--command command') do |command|
         @qspec_opts[:command] = command
       end
+      opts.on('--spork') do
+        @qspec_opts[:spork] = true
+      end
 
       opts.parse!(options)
     end
@@ -45,7 +50,9 @@ module Qspec
       @output = @configuration.output_stream ||= out
       @options.configure(@configuration)
 
-      if @qspec_opts[:count]
+      if @qspec_opts[:spork]
+        start_spork_workers
+      elsif @qspec_opts[:count]
         start_worker
       else
         process
