@@ -1,11 +1,6 @@
 require 'rspec'
 require 'rspec/core/command_line'
-require 'rspec/core/formatters/helpers'
-require 'qspec/manager'
-require 'qspec/spork_helper'
-require 'qspec/configuration_options'
 require 'redis'
-require 'optparse'
 
 module Qspec
   class CommandLine < ::RSpec::Core::CommandLine

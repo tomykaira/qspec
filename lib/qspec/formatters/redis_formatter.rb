@@ -1,4 +1,3 @@
-require 'redis'
 require 'rspec/core/formatters/base_formatter'
 
 module Qspec

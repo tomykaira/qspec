@@ -1,7 +1,7 @@
 require 'rspec/core/drb_options'
 require 'rspec/core/configuration_options'
-require 'qspec/option_parser'
 
+# Override parsers
 module Qspec
   class ConfigurationOptions < ::RSpec::Core::ConfigurationOptions
     def env_options

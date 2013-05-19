@@ -1,3 +1,5 @@
+require 'rspec/core/formatters/helpers'
+
 module Qspec
   module Manager
     attr_reader :output
