@@ -50,7 +50,11 @@ module Qspec
       id = rand(10000)
       puts "ID: #{id}"
       register_files(id)
-      @qspec_opts[:count].times.map { spawn(@qspec_opts[:command] || "qspec --id #{id} #{@rest.join(' ')}") }
+      @qspec_opts[:count].times do |i|
+        spawn({ "TEST_ENV_NUMBER" => i == 0 ? '' : (i + 1).to_s },
+              @qspec_opts[:command] || "qspec --id #{id} #{@rest.join(' ')}",
+              out: '/dev/null')
+      end
       exit((Process.waitall.all? { |pid, status| status.exitstatus == 0 }) ? 0 : 1)
     end
 
