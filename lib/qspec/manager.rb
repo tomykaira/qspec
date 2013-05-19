@@ -23,6 +23,7 @@ module Qspec
         end
       end
 
+      @stats = []
       thread = start_progress_thread(id)
       success = Process.waitall.all? { |pid, status| status.exitstatus == 0 }
       thread.exit
@@ -35,6 +36,8 @@ module Qspec
         dump_failure(failure)
         dump_backtrace(failure[:exception])
       end
+
+      dump_summary
       exit(success ? 0 : 1)
     ensure
       if redis
@@ -56,6 +59,7 @@ module Qspec
 
     def pop_stat(id)
       each_object("stat_#{id}") do |obj|
+        @stats << obj
         output.puts obj.inspect
       end
     end
@@ -64,6 +68,15 @@ module Qspec
       while data = redis.lpop(key)
         yield(Marshal.load(data))
       end
+    end
+
+    def dump_summary
+      sum = @stats.each_with_object({ example: 0, failure: 0, pending: 0 }) do |stat, sum|
+        sum[:example] += stat[2]
+        sum[:failure] += stat[3]
+        sum[:pending] += stat[4]
+      end
+      output.puts "\n#{sum[:example]} examples, #{sum[:failure]} failures, #{sum[:pending]} pendings"
     end
 
     def dump_failure(failure)
