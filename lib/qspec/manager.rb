@@ -3,7 +3,6 @@ module Qspec
     attr_reader :output
 
     def start_worker
-      redis = Redis.new
       id = rand(10000)
       output.puts "ID: #{id}"
       register_files(redis, id)
