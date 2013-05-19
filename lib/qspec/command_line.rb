@@ -1,15 +1,14 @@
 require 'rspec'
 require 'rspec/core/command_line'
-require 'redis'
 
 module Qspec
   class CommandLine < ::RSpec::Core::CommandLine
     include Manager # defines start_worker
     include SporkHelper
-    attr_reader :output, :redis
+    attr_reader :output, :ipc
 
     def initialize(options)
-      @redis = Redis.new
+      @ipc = IPC.available_instance
 
       options = ::Qspec::ConfigurationOptions.new(options)
       options.parse_options
@@ -33,7 +32,7 @@ module Qspec
     def process
       success = true
       id = @options.options[:id]
-      while f = redis.lpop("to_run_#{id}")
+      while f = ipc.lpop("to_run_#{id}")
         @configuration.add_formatter(Qspec::Formatters::RedisFormatterFactory.build(id, f))
         begin
           load File.expand_path(f)
