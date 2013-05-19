@@ -1,4 +1,5 @@
 require 'qspec/version'
+require 'qspec/ipc'
 require 'qspec/manager'
 require 'qspec/spork_helper'
 require 'qspec/configuration_options'

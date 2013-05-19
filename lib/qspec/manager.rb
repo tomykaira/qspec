@@ -7,7 +7,7 @@ module Qspec
     def start_worker
       id = rand(10000)
       output.puts "ID: #{id}"
-      register_files(redis, id)
+      register_files(id)
       if runnning_ports
         puts "Connecting to spork: #{runnning_ports.inspect}"
         runnning_ports.each do |port|
@@ -30,7 +30,7 @@ module Qspec
 
       pop_stat(id)
 
-      output.puts "Failures: " if redis.llen("failure_#{id}") > 0
+      output.puts "Failures: " if ipc.llen("failure_#{id}") > 0
 
       each_object("failure_#{id}") do |failure|
         dump_failure(failure)
@@ -40,10 +40,10 @@ module Qspec
       dump_summary
       exit(success ? 0 : 1)
     ensure
-      if redis
-        redis.del("to_run_#{id}")
-        redis.del("stat_#{id}")
-        redis.del("failure_#{id}")
+      if ipc
+        ipc.del("to_run_#{id}")
+        ipc.del("stat_#{id}")
+        ipc.del("failure_#{id}")
       end
     end
 
@@ -65,7 +65,7 @@ module Qspec
     end
 
     def each_object(key)
-      while data = redis.lpop(key)
+      while data = ipc.lpop(key)
         yield(Marshal.load(data))
       end
     end
@@ -97,9 +97,9 @@ module Qspec
       end
     end
 
-    def register_files(redis, id)
+    def register_files(id)
       sort_by_size(@configuration.files_to_run).uniq.each do |f|
-        redis.rpush "to_run_#{id}", f
+        ipc.rpush "to_run_#{id}", f
       end
     end
 
