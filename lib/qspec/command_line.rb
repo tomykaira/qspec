@@ -47,19 +47,34 @@ module Qspec
     end
 
     def start_worker
+      redis = Redis.new
       id = rand(10000)
       puts "ID: #{id}"
-      register_files(id)
+      register_files(redis, id)
       @qspec_opts[:count].times do |i|
         spawn({ "TEST_ENV_NUMBER" => i == 0 ? '' : (i + 1).to_s },
               @qspec_opts[:command] || "qspec --id #{id} #{@rest.join(' ')}",
               out: '/dev/null')
       end
-      exit((Process.waitall.all? { |pid, status| status.exitstatus == 0 }) ? 0 : 1)
+      success = Process.waitall.all? { |pid, status| status.exitstatus == 0 }
+      while redis.llen("stat_#{id}") > 0
+        p Marshal.load(redis.lpop("stat_#{id}"))
+      end
+      puts "Failures: " if redis.llen("failure_#{id}") > 0
+      while redis.llen("failure_#{id}") > 0
+        p Marshal.load(redis.lpop("failure_#{id}"))
+      end
+
+      exit(success ? 0 : 1)
+    ensure
+      if redis
+        redis.del("to_run_#{id}")
+        redis.del("stat_#{id}")
+        redis.del("failure_#{id}")
+      end
     end
 
-    def register_files(id)
-      redis = Redis.new
+    def register_files(redis, id)
       sort_by_size(@configuration.files_to_run).uniq do |f|
         redis.rpush "to_run_#{id}", f
       end
@@ -72,20 +87,17 @@ module Qspec
 
     def process
       redis = Redis.new
-      failed = false
+      success = true
       id = @qspec_opts[:id]
       while f = redis.lpop("to_run_#{id}")
+        @configuration.formatters.clear
+        @configuration.add_formatter(Qspec::Formatters::RedisFormatterFactory.build(id, f))
         begin
           load File.expand_path(f)
           @configuration.reporter.report(@world.example_count, @configuration.randomize? ? @configuration.seed : nil) do |reporter|
             begin
               @configuration.run_hook(:before, :suite)
-              if @world.example_groups.ordered.all? {|g| g.run(reporter)}
-                redis.rpush("result_#{id}", 'success')
-              else
-                redis.rpush("result_#{id}", 'failure')
-                failed = true
-              end
+              success &&= @world.example_groups.ordered.all? {|g| g.run(reporter)}
             ensure
               @configuration.run_hook(:after, :suite)
             end
@@ -94,7 +106,7 @@ module Qspec
           @world.example_groups.clear
         end
       end
-      failed ? @configuration.failure_exit_code : 0
+      success ? 0 : @configuration.failure_exit_code
     end
   end
 end
