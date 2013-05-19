@@ -12,7 +12,7 @@ module Qspec
       end
 
       def initialize(output)
-        @redis = Redis.new
+        @ipc = IPC.available_instance
         super
       end
 
@@ -24,13 +24,13 @@ module Qspec
             position: read_failed_line(ex, example),
             exception: ex
           }
-          @redis.rpush("failure_#{@@id}", Marshal.dump(data))
+          @ipc.rpush("failure_#{@@id}", Marshal.dump(data))
         end
       end
 
       def dump_summary(duration, example_count, failure_count, pending_count)
         data = [@@file, duration, example_count, failure_count, pending_count]
-        @redis.rpush("stat_#{@@id}", Marshal.dump(data))
+        @ipc.rpush("stat_#{@@id}", Marshal.dump(data))
       end
     end
   end
