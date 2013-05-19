@@ -56,9 +56,14 @@ module Qspec
 
     def register_files(id)
       redis = Redis.new
-      @configuration.files_to_run.uniq do |f|
+      sort_by_size(@configuration.files_to_run).uniq do |f|
         redis.rpush "to_run_#{id}", f
       end
+    end
+
+    # large to small
+    def sort_by_size(files)
+      files.sort_by { |file| -File.stat(file).size }
     end
 
     def process
