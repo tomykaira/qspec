@@ -46,8 +46,8 @@ module Qspec
             end
           end
         ensure
-          @configuration.formatters.clear
           @world.example_groups.clear
+          @configuration.reset # formatter, reporter
         end
       end
       success ? 0 : @configuration.failure_exit_code
