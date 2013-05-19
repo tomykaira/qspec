@@ -4,6 +4,7 @@ class Spork::TestFramework::Qspec < Spork::TestFramework
   HELPER_FILE = File.join(Dir.pwd, "spec/spec_helper.rb")
 
   def run_tests(argv, stderr, stdout)
+    require 'qspec'
     ::Qspec::CommandLine.new(argv).run(stderr, stdout)
   end
 end

@@ -1,3 +1,4 @@
+require 'drb/drb'
 require 'spork/test_framework/qspec'
 
 module Qspec
@@ -19,6 +20,16 @@ module Qspec
       end
       create_port_file(ports)
       Process.waitall.all? { |pid, status| status.exitstatus == 0 } ? 0 : 1
+    end
+
+    def connect_spork(port, id, err, out)
+      begin
+        DRb.start_service("druby://localhost:0")
+      rescue SocketError, Errno::EADDRNOTAVAIL
+        DRb.start_service("druby://:0")
+      end
+      spec_server = DRbObject.new_with_uri("druby://127.0.0.1:#{port||PORT}")
+      spec_server.run(@options.drb_argv + ['--id', id.to_s], err, out)
     end
 
     def create_port_file(ports)

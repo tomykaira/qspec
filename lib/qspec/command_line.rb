@@ -52,7 +52,7 @@ module Qspec
 
       if @qspec_opts[:spork]
         start_spork_workers
-      elsif @qspec_opts[:count]
+      elsif @qspec_opts[:count] || @options.options[:drb]
         start_worker
       else
         process

@@ -6,11 +6,21 @@ module Qspec
       id = rand(10000)
       output.puts "ID: #{id}"
       register_files(redis, id)
-      @qspec_opts[:count].times do |i|
-        spawn({ "TEST_ENV_NUMBER" => i == 0 ? '' : (i + 1).to_s },
-              @qspec_opts[:command] || "qspec --id #{id} #{@rest.join(' ')}",
-              out: '/dev/null')
+      if runnning_ports
+        puts "Connecting to spork: #{runnning_ports.inspect}"
+        runnning_ports.each do |port|
+          fork do
+            connect_spork(port, id, @configuration.error_stream, output)
+          end
+        end
+      else
+        @qspec_opts[:count].times do |i|
+          spawn({ "TEST_ENV_NUMBER" => i == 0 ? '' : (i + 1).to_s },
+                @qspec_opts[:command] || "qspec --id #{id} #{@rest.join(' ')}",
+                out: '/dev/null')
+        end
       end
+
       thread = start_progress_thread(id)
       success = Process.waitall.all? { |pid, status| status.exitstatus == 0 }
       thread.exit
