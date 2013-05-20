@@ -30,6 +30,8 @@ module Qspec
     end
 
     def process
+      GC.disable if @options.options[:nogc]
+
       success = true
       id = @options.options[:id]
       while f = ipc.lpop("to_run_#{id}")
