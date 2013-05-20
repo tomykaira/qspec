@@ -2,6 +2,8 @@ require 'rspec/core/formatters/helpers'
 
 module Qspec
   module Manager
+    TIME_LOG_NAME = 'elapsed_time'
+    DEFAULT_ELAPSED_TIME = 3.0
     attr_reader :output
 
     def start_worker
@@ -37,6 +39,7 @@ module Qspec
         dump_backtrace(failure[:exception])
       end
 
+      log_elapsed_times
       dump_summary
       exit(success ? 0 : 1)
     ensure
@@ -97,10 +100,31 @@ module Qspec
       end
     end
 
+    def log_elapsed_times
+      File.open(Qspec.path(TIME_LOG_NAME), 'w') do |f|
+        @stats.each do |stat|
+          f.puts "#{File.expand_path(stat[0])}:#{stat[1].to_f}"
+        end
+      end
+    end
+
     def register_files(id)
-      sort_by_size(@configuration.files_to_run).uniq.each do |f|
+      sorted_files_to_run.uniq.each do |f|
         ipc.rpush "to_run_#{id}", f
       end
+    end
+
+    def sorted_files_to_run
+      @sorted_files_to_run ||= if File.exists?(Qspec.path(TIME_LOG_NAME))
+                                 sort_by_time(@configuration.files_to_run)
+                               else
+                                 sort_by_size(@configuration.files_to_run)
+                               end
+    end
+
+    def sort_by_time(files)
+      log = Hash[File.readlines(Qspec.path(TIME_LOG_NAME)).map { |line| line.strip.split(":") }]
+      files.sort_by { |file| log[File.expand_path(file)].to_f || DEFAULT_ELAPSED_TIME }.reverse
     end
 
     # large to small

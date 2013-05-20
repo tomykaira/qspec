@@ -8,5 +8,11 @@ require 'qspec/command_line'
 require 'qspec/formatters/redis_formatter'
 
 module Qspec
-  # Your code goes here...
+  DIRECTORY = File.expand_path('tmp/qspec')
+
+  FileUtils.mkdir_p(DIRECTORY) unless FileTest.exists?(DIRECTORY)
+
+  def self.path(filename)
+    File.join(DIRECTORY, filename)
+  end
 end

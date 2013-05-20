@@ -10,7 +10,7 @@ module Qspec
       end
 
       def del(key)
-        ::File.unlink(file_name(key)) rescue nil
+        ::File.unlink(Qspec.path(key)) rescue nil
       end
 
       def lpop(key)
@@ -46,15 +46,11 @@ module Qspec
                      when :rw then [::File::RDWR|::File::CREAT|::File::BINARY, ::File::LOCK_EX]
                      when :r  then [::File::RDONLY|::File::CREAT|::File::BINARY, ::File::LOCK_SH]
                      end
-        ::File.open(file_name(key), mode) do |f|
+        ::File.open(Qspec.path(key), mode) do |f|
           f.flock(lock)
           f.set_encoding('ASCII-8BIT')
           yield(f)
         end
-      end
-
-      def file_name(key)
-        ::File.join(DIRECTORY, key)
       end
 
       def safe_load(f)
