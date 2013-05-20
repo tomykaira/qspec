@@ -5,9 +5,10 @@ module Qspec
     TIME_LOG_NAME = 'elapsed_time'
     DEFAULT_ELAPSED_TIME = 3.0
     attr_reader :output
+    attr_reader :id
 
     def start_worker
-      id = rand(10000)
+      @id = rand(10000)
       output.puts "ID: #{id}"
       register_files(id)
       if runnning_ports
@@ -18,9 +19,11 @@ module Qspec
           end
         end
       else
+        command = @options.options[:command]
+        command ||= "qspec #{command_arguments.join(' ')}"
         @options.options[:count].times do |i|
           spawn({ "TEST_ENV_NUMBER" => i == 0 ? '' : (i + 1).to_s },
-                @options.options[:command] || "qspec --id #{id}",
+                command,
                 out: '/dev/null')
         end
       end
@@ -51,6 +54,13 @@ module Qspec
     end
 
     private
+    def command_arguments
+      args = ['--id', id.to_s]
+      args << '--no-gc' if @options.options[:nogc]
+
+      args
+    end
+
     def start_progress_thread(id)
       Thread.new do
         loop do

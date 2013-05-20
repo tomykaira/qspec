@@ -18,6 +18,9 @@ module Qspec
       parser.on('--spork') do
         options[:spork] = true
       end
+      parser.on('--no-gc') do
+        options[:nogc] = true
+      end
 
       parser
     end

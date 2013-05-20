@@ -33,7 +33,7 @@ module Qspec
         DRb.start_service("druby://:0")
       end
       spec_server = DRbObject.new_with_uri("druby://127.0.0.1:#{port||PORT}")
-      exit spec_server.run(@options.drb_argv + ['--id', id.to_s], err, out).to_i
+      exit spec_server.run(@options.drb_argv + command_arguments, err, out).to_i
     end
 
     def create_port_file(ports)
