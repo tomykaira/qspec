@@ -30,8 +30,6 @@ module Qspec
     end
 
     def process
-      GC.disable if @options.options[:nogc]
-
       success = true
       id = @options.options[:id]
       while f = ipc.lpop("to_run_#{id}")
@@ -40,10 +38,13 @@ module Qspec
           load File.expand_path(f)
           @configuration.reporter.report(@world.example_count, @configuration.randomize? ? @configuration.seed : nil) do |reporter|
             begin
+              GC.disable if @options.options[:nogc]
               @configuration.run_hook(:before, :suite)
               success &&= @world.example_groups.ordered.all? {|g| g.run(reporter)}
             ensure
               @configuration.run_hook(:after, :suite)
+              GC.enable if @options.options[:nogc]
+              GC.start  if @options.options[:nogc]
             end
           end
         ensure
