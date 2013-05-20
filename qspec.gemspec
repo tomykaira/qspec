@@ -17,5 +17,5 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  gem.add_dependency 'rspec-core', '2.13.0'
+  gem.add_dependency 'rspec-core', '~>2.13.1'
 end
