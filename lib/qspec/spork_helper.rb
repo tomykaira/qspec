@@ -37,14 +37,14 @@ module Qspec
     end
 
     def create_port_file(ports)
-      File.open('tmp/qspec_spork', 'w') do |f|
+      File.open(port_file, 'w') do |f|
         f.puts ports.join("\n")
       end
     end
 
     def runnning_ports
       @runnning_ports ||= begin
-        ports = File.readlines('tmp/qspec_spork').map { |line| line.strip.to_i }
+        ports = File.readlines(port_file).map { |line| line.strip.to_i }
         ports.empty? ? nil : ports
       rescue Errno::ENOENT
         nil
@@ -52,7 +52,12 @@ module Qspec
     end
 
     def remove_port_file
-      File.unlink('tmp/qspec_spork')
+      File.unlink(port_file)
+    end
+
+    private
+    def port_file
+      @port_file ||= Qspec.path('spork_ports')
     end
   end
 end
