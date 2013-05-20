@@ -1,4 +1,4 @@
-require 'rspec'
+require 'rspec/core'
 require 'rspec/core/command_line'
 
 module Qspec
