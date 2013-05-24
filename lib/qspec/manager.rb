@@ -39,7 +39,6 @@ module Qspec
 
       each_object("failure_#{id}") do |failure|
         dump_failure(failure)
-        dump_backtrace(failure[:exception])
       end
 
       log_elapsed_times
@@ -93,19 +92,9 @@ module Qspec
     end
 
     def dump_failure(failure)
-      exception = failure[:exception]
-      exception_class_name = exception.class.to_s
-      output.puts
-      output.puts "* #{failure[:description]}"
-      output.puts "\tFailure/Error: #{failure[:position]}"
-      output.puts "\t#{exception_class_name}:" unless exception_class_name =~ /RSpec/
-      exception.message.to_s.split("\n").each { |line| output.puts "\t  #{line}" } if exception.message
-    end
-
-    def dump_backtrace(exception)
-      lines = RSpec::Core::BacktraceFormatter.format_backtrace(exception.backtrace,
-                                                               { full_backtrace: @options.options[:full_backtrace] })
-      lines.each do |line|
+      puts ""
+      puts failure[:exception]
+      failure[:backtrace].each do |line|
         output.puts "\t#{line}"
       end
     end
