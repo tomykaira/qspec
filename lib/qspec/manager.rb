@@ -72,6 +72,7 @@ module Qspec
     def pop_stat(id)
       each_object("stat_#{id}") do |obj|
         @stats << obj
+        output.print "!!! " if obj[3] > 0
         output.puts obj.inspect
       end
     end
