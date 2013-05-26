@@ -5,10 +5,11 @@ module Qspec
   class CommandLine < ::RSpec::Core::CommandLine
     include Manager # defines start_worker
     include SporkHelper
-    attr_reader :output, :ipc
+    attr_reader :output, :ipc, :config
 
     def initialize(options)
-      @ipc = IPC.available_instance
+      @config = Config.new()
+      @ipc = IPC.from_config(@config['ipc'])
 
       options = ::Qspec::ConfigurationOptions.new(options)
       options.parse_options

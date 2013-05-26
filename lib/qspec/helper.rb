@@ -5,7 +5,7 @@ module Qspec
     end
 
     def serve
-      case argv.last
+      case @argv.last
       when 'init'
         puts "Creating template"
         Config.new.create_template

@@ -1,12 +1,22 @@
 module Qspec
   # abstract
   class IPC
-    def self.available_instance
-      if self.constants.include?(:Redis)
-        IPC::Redis.new
-      else
-        IPC::File.new
-      end
+    def self.from_config(name)
+      @@default =
+        case name
+        when 'redis'
+          require 'qspec/ipc/redis'
+          IPC::Redis.new
+        when 'file', nil
+          require 'qspec/ipc/file'
+          IPC::File.new
+        else
+          raise "Unknown IPC method #{name}"
+        end
+    end
+
+    def self.default
+      @@default || (raise 'Default IPC module not set')
     end
 
     def del(key)
@@ -22,6 +32,3 @@ module Qspec
     end
   end
 end
-
-require 'qspec/ipc/redis'
-require 'qspec/ipc/file'
