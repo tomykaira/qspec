@@ -20,8 +20,7 @@ module Qspec
         end
       else
         puts "Forking #{@config['workers']} workers"
-        command = @options.options[:command]
-        command ||= "qspec"
+        command = "qspec #{@options.drb_argv.join " "}"
         @config['workers'].times do |i|
           env = {
             "qspec_id" => id.to_s,
