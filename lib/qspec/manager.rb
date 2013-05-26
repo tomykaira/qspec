@@ -111,7 +111,7 @@ module Qspec
     end
 
     def sorted_files_to_run
-      @sorted_files_to_run ||= if File.exists?(Qspec.path(TIME_LOG_NAME))
+      @sorted_files_to_run ||= if @config['sort_by'] == 'time' && File.exists?(Qspec.path(TIME_LOG_NAME))
                                  sort_by_time(@configuration.files_to_run)
                                else
                                  sort_by_size(@configuration.files_to_run)

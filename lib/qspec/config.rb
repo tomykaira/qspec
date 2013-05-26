@@ -22,6 +22,7 @@ module Qspec
 # Parallelization setting differs between machines.
 no_gc: false
 ipc: file         # 'file' or 'redis', if 'redis', gem and server are required
+sort_by: time     # 'time' or 'size',  if 'time', store execution time and use it next time
 workers: 4  # half of cpu - number of cpu
 TMPL
       end
