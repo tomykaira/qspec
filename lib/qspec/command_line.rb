@@ -37,13 +37,13 @@ module Qspec
           load File.expand_path(f)
           @configuration.reporter.report(@world.example_count, @configuration.randomize? ? @configuration.seed : nil) do |reporter|
             begin
-              GC.disable if @options.options[:nogc]
+              GC.disable if @config['no_gc']
               @configuration.run_hook(:before, :suite)
               success &&= @world.example_groups.ordered.all? {|g| g.run(reporter)}
             ensure
               @configuration.run_hook(:after, :suite)
-              GC.enable if @options.options[:nogc]
-              GC.start  if @options.options[:nogc]
+              GC.enable if @config['no_gc']
+              GC.start  if @config['no_gc']
             end
           end
         ensure
