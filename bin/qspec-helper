@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require 'qspec'
+Qspec::Helper.new(ARGV).serve

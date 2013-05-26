@@ -5,6 +5,7 @@ class Spork::TestFramework::Qspec < Spork::TestFramework
 
   def run_tests(argv, stderr, stdout)
     require 'qspec'
+    ENV['qspec_id'] = argv.pop.to_s
     ::Qspec::CommandLine.new(argv).run(stderr, stdout)
   end
 end

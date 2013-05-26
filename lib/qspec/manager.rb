@@ -19,10 +19,13 @@ module Qspec
           end
         end
       else
-        command = @options.options[:command]
-        command ||= "qspec #{command_arguments.join(' ')}"
-        @options.options[:count].times do |i|
-          spawn({ "TEST_ENV_NUMBER" => i == 0 ? '' : (i + 1).to_s },
+        puts "Forking #{@config['workers']} workers"
+        command = "qspec #{@options.drb_argv.join " "}"
+        @config['workers'].times do |i|
+          env = {
+            "qspec_id" => id.to_s,
+            "TEST_ENV_NUMBER" => i == 0 ? '' : (i + 1).to_s }
+          spawn(env,
                 command,
                 out: '/dev/null')
         end
@@ -53,13 +56,6 @@ module Qspec
     end
 
     private
-    def command_arguments
-      args = ['--id', id.to_s]
-      args << '--no-gc' if @options.options[:nogc]
-
-      args
-    end
-
     def start_progress_thread(id)
       Thread.new do
         loop do
@@ -115,7 +111,7 @@ module Qspec
     end
 
     def sorted_files_to_run
-      @sorted_files_to_run ||= if File.exists?(Qspec.path(TIME_LOG_NAME))
+      @sorted_files_to_run ||= if @config['sort_by'] == 'time' && File.exists?(Qspec.path(TIME_LOG_NAME))
                                  sort_by_time(@configuration.files_to_run)
                                else
                                  sort_by_size(@configuration.files_to_run)

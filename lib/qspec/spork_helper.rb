@@ -5,19 +5,21 @@ begin
 rescue LoadError
 end
 
+require 'rspec/core/drb_options'
+
 module Qspec
   module SporkHelper
     PORT = ::Spork::TestFramework::Qspec::DEFAULT_PORT
 
-    def start_spork_workers
+    def start_spork_workers(count)
       Signal.trap(:INT){
-        output.puts "Stop spork processes"
+        puts "Stop spork processes"
         remove_port_file
         exit(0)
       }
 
       ports = []
-      @options.options[:count].times do |i|
+      count.times do |i|
         spawn({ "TEST_ENV_NUMBER" => i == 0 ? '' : (i + 1).to_s },
               "spork qspec --port #{PORT+i}")
         ports << PORT+i
@@ -33,7 +35,7 @@ module Qspec
         DRb.start_service("druby://:0")
       end
       spec_server = DRbObject.new_with_uri("druby://127.0.0.1:#{port||PORT}")
-      exit spec_server.run(@options.drb_argv + command_arguments, err, out).to_i
+      exit spec_server.run(@options.drb_argv + [id], err, out).to_i
     end
 
     def create_port_file(ports)

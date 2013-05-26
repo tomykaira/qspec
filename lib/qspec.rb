@@ -1,11 +1,12 @@
+require 'rspec/core'
 require 'qspec/version'
 require 'qspec/ipc'
 require 'qspec/manager'
 require 'qspec/spork_helper'
-require 'qspec/configuration_options'
-require 'qspec/option_parser'
 require 'qspec/command_line'
 require 'qspec/formatters/redis_formatter'
+require 'qspec/config'
+require 'qspec/helper'
 
 module Qspec
   DIRECTORY = File.expand_path('tmp/qspec')

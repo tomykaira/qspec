@@ -17,5 +17,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
+  gem.post_install_message = "Run qspec-helper init to create your config file"
+
   gem.add_dependency 'rspec-core', '~>2.13.1'
 end

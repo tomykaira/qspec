@@ -12,7 +12,7 @@ module Qspec
       end
 
       def initialize(output)
-        @ipc = IPC.available_instance
+        @ipc = IPC.default
         super
       end
 
