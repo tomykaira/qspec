@@ -21,9 +21,7 @@ module Qspec
       @output = @configuration.output_stream ||= out
       @options.configure(@configuration)
 
-      if @options.options[:spork]
-        start_spork_workers
-      elsif @options.options[:count] || @options.options[:drb]
+      if @options.options[:count] || @options.options[:drb]
         start_worker
       else
         process
