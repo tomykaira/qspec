@@ -6,6 +6,7 @@ require 'qspec/configuration_options'
 require 'qspec/option_parser'
 require 'qspec/command_line'
 require 'qspec/formatters/redis_formatter'
+require 'qspec/config'
 
 module Qspec
   DIRECTORY = File.expand_path('tmp/qspec')
