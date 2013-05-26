@@ -1,4 +1,3 @@
-require 'rspec/core'
 require 'rspec/core/command_line'
 
 module Qspec
@@ -12,8 +11,6 @@ module Qspec
       @ipc = IPC.from_config(@config['ipc'])
       @id = ENV['qspec_id']
 
-      options = ::Qspec::ConfigurationOptions.new(options)
-      options.parse_options
       super(options)
     end
 

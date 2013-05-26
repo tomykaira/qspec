@@ -5,6 +5,8 @@ begin
 rescue LoadError
 end
 
+require 'rspec/core/drb_options'
+
 module Qspec
   module SporkHelper
     PORT = ::Spork::TestFramework::Qspec::DEFAULT_PORT
