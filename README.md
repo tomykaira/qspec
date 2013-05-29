@@ -35,17 +35,24 @@ If `require 'redis'` succeed, it uses automatically redis for IPC.
 
 Installing this gem adds `qspec` command.
 
-### Run spec in 8 cores
+### Setup
 
 ```sh
-bundle exec qspec --parallel 8 spec
+$ bundle exec qspec-helper init
+# edit .qspec.yml
 ```
 
-### Start 8 spork instances, then run on them
+### Run spec
 
 ```sh
-bundle exec qspec --parallel 8 --spork
-bundle exec qspec --drb spec
+bundle exec qspec spec/
+```
+
+### Run with spork
+
+```sh
+bundle exec qspec-helper spork
+bundle exec qspec spec/
 ```
 
 ### options
