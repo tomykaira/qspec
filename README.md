@@ -55,19 +55,6 @@ bundle exec qspec-helper spork
 bundle exec qspec spec/
 ```
 
-### options
-
-`--parallel count`
-: Start given number of worker processes.  Number of the box's cores is recommended.
-
-`--spork`
-: Start spork processes.  To stop them, kill this process with `C-c` or `kill`
-
-`--no-gc`
-: Disable GC in workers.
-  WARNING: If the box has not enough memory, it becomes slower or even freezes.
-
-
 ## Contributing
 
 1. Fork it
