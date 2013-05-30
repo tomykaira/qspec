@@ -9,8 +9,6 @@ require 'rspec/core/drb_options'
 
 module Qspec
   module SporkHelper
-    PORT = ::Spork::TestFramework::Qspec::DEFAULT_PORT
-
     def start_spork_workers(count)
       Signal.trap(:INT){
         puts "Stop spork processes"
@@ -18,11 +16,13 @@ module Qspec
         exit(0)
       }
 
+      default_port = (@config['spork_port'] || ::Spork::TestFramework::Qspec::DEFAULT_PORT).to_i
       ports = []
       count.times do |i|
+        port = default_port+i
         spawn({ "TEST_ENV_NUMBER" => i == 0 ? '' : (i + 1).to_s },
-              "spork qspec --port #{PORT+i}")
-        ports << PORT+i
+              "spork qspec --port #{port}")
+        ports << port
       end
       create_port_file(ports)
       Process.waitall.all? { |pid, status| status.exitstatus == 0 } ? 0 : 1
