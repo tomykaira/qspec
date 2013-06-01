@@ -19,21 +19,26 @@ Or install it yourself as:
 ## Additional Installation
 
 You can use `spork` to cut the overhead of Qspec startup.
-HEAD version is highly recommended.  Old `spork` does not detect Qspec in cases.
+**Use 1.0**. Old `spork` does not detect Qspec.
 
 ```ruby
-  gem 'spork', github: 'sporkrb/spork'
+  gem 'spork', '~> 1.0rc'
 ```
 
-By default, qspec uses file based inter-process communication.
-This is poor implementation and becomes a burden.
+If you are on rails, remember to add `spork-rails` too.
 
-We recommend to use `redis`.  Setting up redis-server with default port, and add `redis` gem to your Gemfile is enough.
-If `require 'redis'` succeed, it uses automatically redis for IPC.
+By default, qspec uses file based inter-process communication.
+This is poorly implemented and becomes a burden.
+
+We recommend to use `redis`.
+
+- Setting up redis-server with default port
+- Add `redis` gem to your Gemfile
+- Specify `redis` for IPC method in `.qspec.yml`
 
 ## Usage
 
-Installing this gem adds `qspec` command.
+Installing this gem adds `qspec` and `qspec-helper` commands.
 
 ### Setup
 
