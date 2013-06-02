@@ -8,7 +8,7 @@ module Qspec
 
     def initialize(options)
       @config = Config.new()
-      @ipc = IPC.from_config(@config['ipc'])
+      @ipc = IPC.from_config(@config)
       @id = ENV['qspec_id']
 
       super(options)

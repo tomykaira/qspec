@@ -1,15 +1,16 @@
 module Qspec
   # abstract
   class IPC
-    def self.from_config(name)
+    def self.from_config(config)
+      name = config['ipc']
       @@default =
         case name
         when 'redis'
           require 'qspec/ipc/redis'
-          IPC::Redis.new
+          IPC::Redis.new(config['redis'])
         when 'file', nil
           require 'qspec/ipc/file'
-          IPC::File.new
+          IPC::File.new(config['file'])
         else
           raise "Unknown IPC method #{name}"
         end
