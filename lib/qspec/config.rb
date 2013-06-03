@@ -32,6 +32,7 @@ ipc: file         # 'file' or 'redis', if 'redis', gem and server are required
 sort_by: time     # 'time' or 'size',  if 'time', store execution time and use it next time
 workers: 4        # half of cpu - number of cpu
 spork_port: 9240  # specified port..port+N-1 are used
+tmp_directory: tmp/qspec # the root directory for temporary files. relative or absolute
 TMPL
       end
       puts "Config file created in #{path}. Check it before run `qspec spec`."

@@ -9,7 +9,7 @@ require 'qspec/config'
 require 'qspec/helper'
 
 module Qspec
-  DIRECTORY = File.expand_path('tmp/qspec')
+  DIRECTORY = File.expand_path(Config.new['tmp_directory'] || 'tmp/qspec')
 
   FileUtils.mkdir_p(DIRECTORY) unless FileTest.exists?(DIRECTORY)
 
