@@ -60,6 +60,24 @@ bundle exec qspec-helper spork
 bundle exec qspec spec/
 ```
 
+## Configuration
+
+All configuration is done through `.qspec.yml`.
+`qspec-helper init` will generate the template, but there are more options.
+
+### redis
+
+This option is given to redis's constructor.
+See [redis-rb/README.md](https://github.com/redis/redis-rb/blob/master/README.md) for more details.
+
+```yaml
+redis:
+    host: localhost
+    port: 6379
+    namespace: qspec
+    driver: hiredis
+```
+
 ## Contributing
 
 1. Fork it
