@@ -3,12 +3,7 @@ require 'fileutils'
 module Qspec
   class IPC
     class File < IPC
-      DEFAULT_DIRECTORY = 'tmp/qspec'
-
       def initialize(config)
-        config ||= {}
-        dir = config['path'] || DEFAULT_DIRECTORY
-        FileUtils.mkdir_p(dir) unless FileTest.exists?(dir)
       end
 
       def del(key)
