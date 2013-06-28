@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'qspec'
+Qspec.create_tmp_directory_if_not_exist
+
 status = Qspec::CommandLine.new(ARGV).run($stderr, $stdout).to_i
 exit status
