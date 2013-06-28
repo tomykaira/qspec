@@ -9,11 +9,17 @@ require 'qspec/config'
 require 'qspec/helper'
 
 module Qspec
-  DIRECTORY = File.expand_path(Config.new['tmp_directory'] || 'tmp/qspec')
+  class << self
+    def path(filename)
+      File.join(tmp_directory_path, filename)
+    end
 
-  FileUtils.mkdir_p(DIRECTORY) unless FileTest.exists?(DIRECTORY)
+    def tmp_directory_path
+      @tmp_directory_path ||= File.expand_path(Config.new['tmp_directory'] || 'tmp/qspec')
+    end
 
-  def self.path(filename)
-    File.join(DIRECTORY, filename)
+    def create_tmp_directory_if_not_exist
+      FileUtils.mkdir_p(tmp_directory_path) unless FileTest.exists?(tmp_directory_path)
+    end
   end
 end
