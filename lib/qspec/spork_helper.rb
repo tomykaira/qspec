@@ -44,7 +44,7 @@ module Qspec
       end
     end
 
-    def runnning_ports
+    def running_ports
       @runnning_ports ||= begin
         ports = File.readlines(port_file).map { |line| line.strip.to_i }
         ports.empty? ? nil : ports
