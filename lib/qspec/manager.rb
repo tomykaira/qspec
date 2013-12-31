@@ -27,7 +27,7 @@ module Qspec
             "TEST_ENV_NUMBER" => i == 0 ? '' : (i + 1).to_s }
           spawn(env,
                 command,
-                out: '/dev/null')
+                out: File::NULL)
         end
       end
 
