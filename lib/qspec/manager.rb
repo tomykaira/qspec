@@ -11,9 +11,9 @@ module Qspec
       @id = rand(10000)
       output.puts "ID: #{id}"
       register_files(id)
-      if runnning_ports
-        puts "Connecting to spork: #{runnning_ports.inspect}"
-        runnning_ports.each do |port|
+      if running_ports
+        puts "Connecting to spork: #{running_ports.inspect}"
+        running_ports.each do |host, port|
           fork do
             connect_spork(port, id, @configuration.error_stream, output)
           end
@@ -27,7 +27,7 @@ module Qspec
             "TEST_ENV_NUMBER" => i == 0 ? '' : (i + 1).to_s }
           spawn(env,
                 command,
-                out: '/dev/null')
+                out: File::NULL)
         end
       end
 
