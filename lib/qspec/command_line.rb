@@ -36,7 +36,7 @@ module Qspec
             begin
               GC.disable if @config['no_gc']
               @configuration.run_hook(:before, :suite)
-              success &&= @world.example_groups.ordered.all? {|g| g.run(reporter)}
+              success = @world.example_groups.ordered.all? {|g| g.run(reporter)} && success
             ensure
               @configuration.run_hook(:after, :suite)
               GC.enable if @config['no_gc']
