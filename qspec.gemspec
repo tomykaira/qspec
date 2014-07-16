@@ -19,5 +19,6 @@ Gem::Specification.new do |gem|
 
   gem.post_install_message = "Run qspec-helper init to create your config file"
 
-  gem.add_dependency 'rspec-core', '~>2.14.0'
+  gem.add_dependency 'rspec-core', '~>3.0'
+  gem.add_dependency 'parallel'
 end

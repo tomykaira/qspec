@@ -1,8 +1,15 @@
 require 'rspec/core'
+
+# workaround https://github.com/rspec/rspec-core/pull/1637
+require 'rspec/core/notifications'
+class RSpec::Core::Notifications::NullColorizer
+  def wrap(line, ignored)
+    line
+  end
+end
+
 require 'qspec/version'
 require 'qspec/ipc'
-require 'qspec/manager'
-require 'qspec/spork_helper'
 require 'qspec/command_line'
 require 'qspec/formatters/redis_formatter'
 require 'qspec/config'

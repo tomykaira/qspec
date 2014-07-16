@@ -5,6 +5,7 @@ module Qspec
     module RedisFormatterFactory
       def self.build(id, file)
         Class.new(RSpec::Core::Formatters::BaseFormatter) do
+          RSpec::Core::Formatters.register self, :dump_summary, :dump_failures
           @@id = id
           @@file = file
           include RedisFormatterFactory
@@ -16,31 +17,20 @@ module Qspec
         super
       end
 
-      def dump_failures
-        failed_examples.each do |example|
-          ex = example.execution_result[:exception]
+      def dump_failures(notification)
+        notification.failure_notifications.each do |failure|
           data = {
-            description: example.full_description,
-            exception: format_exception(example, ex),
-            backtrace: format_backtrace(ex.backtrace, example)
+            description: failure.description,
+            exception: failure.message_lines.join("\n"),
+            backtrace: failure.formatted_backtrace
           }
           @ipc.rpush("failure_#{@@id}", Marshal.dump(data))
         end
       end
 
-      def dump_summary(duration, example_count, failure_count, pending_count)
-        data = [@@file, duration, example_count, failure_count, pending_count]
+      def dump_summary(summary)
+        data = [@@file, summary.duration, summary.examples.size, summary.failed_examples.count, summary.pending_examples.count]
         @ipc.rpush("stat_#{@@id}", Marshal.dump(data))
-      end
-
-      def format_exception(example, ex)
-        exception_class_name = ex.class.to_s
-        output = StringIO.new
-        output.puts "* #{example.full_description}"
-        output.puts "\tFailure/Error: #{read_failed_line(ex, example)}"
-        output.puts "\t#{exception_class_name}:" unless exception_class_name =~ /RSpec/
-        ex.message.to_s.split("\n").each { |line| output.puts "\t  #{line}" } if ex.message
-        output.string
       end
     end
   end
