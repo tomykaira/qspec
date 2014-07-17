@@ -24,7 +24,7 @@ module Qspec
       puts "Forking #{@config['workers']} workers"
 
       thread = start_progress_thread(id)
-      success = Parallel.map(1..@config['workers'], in_processes: @config['workers']) do |no|
+      results = Parallel.map(1..@config['workers'], in_processes: @config['workers']) do |no|
         ENV['TEST_ENV_NUMBER'] = no == 1 ? '' : no.to_s
         process
       end
@@ -40,7 +40,7 @@ module Qspec
 
       log_elapsed_times
       dump_summary
-      exit(success ? 0 : 1)
+      exit(results.all? ? 0 : 1)
     ensure
       if ipc
         ipc.del("to_run_#{id}")
