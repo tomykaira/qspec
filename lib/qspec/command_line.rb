@@ -26,7 +26,12 @@ module Qspec
       thread = start_progress_thread(id)
       results = Parallel.map(1..@config['workers'], in_processes: @config['workers']) do |no|
         ENV['TEST_ENV_NUMBER'] = no == 1 ? '' : no.to_s
-        process
+        begin
+          !!process
+        rescue => e
+          puts "Exception in a child process: #{e.inspect}"
+          false
+        end
       end
       thread.exit
 
@@ -61,12 +66,8 @@ module Qspec
 
         begin
           @rspec_configuration.reporter.report(world.example_count(example_groups)) do |reporter|
-            begin
-              hook_context = RSpec::Core::SuiteHookContext.new
-              @rspec_configuration.hooks.run(:before, :suite, hook_context)
+            @rspec_configuration.with_suite_hooks do
               success = example_groups.map { |g| g.run(reporter) }.all? && success
-            ensure
-              @rspec_configuration.hooks.run(:after, :suite, hook_context)
             end
           end
         ensure
