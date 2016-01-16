@@ -26,12 +26,7 @@ module Qspec
       thread = start_progress_thread(id)
       results = Parallel.map(1..@config['workers'], in_processes: @config['workers']) do |no|
         ENV['TEST_ENV_NUMBER'] = no == 1 ? '' : no.to_s
-        begin
-          !!process
-        rescue => e
-          puts "Exception in a child process: #{e.inspect}"
-          false
-        end
+        process
       end
       thread.exit
 
